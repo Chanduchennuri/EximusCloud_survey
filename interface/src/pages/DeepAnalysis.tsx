@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Sparkles, Send, CheckCircle2, User } from "lucide-react";
+import { Sparkles, Send, User } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import TypewriterText from "../components/TypewriterText";
