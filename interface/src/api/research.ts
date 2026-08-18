@@ -5,6 +5,10 @@ import type {
   QuestionResponse,
   AINextQuestion,
   ConversationTurn,
+  AnalyticsSummary,
+  QuestionAnalytics,
+  RespondentRow
+
 } from "../types/api";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
@@ -57,4 +61,24 @@ export function getDeepAnalysisQuestion(
     `${API_BASE}/sessions/${sessionId}/deep-analysis/next-question`,
     { method: "POST" }
   ).then(handle<AINextQuestion>);
+}
+
+export function getAnalyticsSummary(studyId: number): Promise<AnalyticsSummary> {
+  return fetch(`${API_BASE}/studies/${studyId}/analytics/summary`).then(
+    handle<AnalyticsSummary>
+  );
+}
+
+export function getAnalyticsByQuestion(
+  studyId: number
+): Promise<QuestionAnalytics[]> {
+  return fetch(`${API_BASE}/studies/${studyId}/analytics/questions`).then(
+    handle<QuestionAnalytics[]>
+  );
+}
+
+export function getRespondents(studyId: number): Promise<RespondentRow[]> {
+  return fetch(`${API_BASE}/studies/${studyId}/respondents`).then(
+    handle<RespondentRow[]>
+  );
 }

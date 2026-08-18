@@ -46,3 +46,35 @@ export interface ConversationTurn {
   user_answer: string;
   created_at: string;
 }
+
+export interface AnalyticsSummary {
+  total_sessions: number;
+  completed_sessions: number;
+  in_progress_sessions: number;
+  generic_sessions: number;
+  deep_analysis_sessions: number;
+}
+
+export interface QuestionAnalytics {
+  question_id: number;
+  question_text: string;
+  question_type: string;
+  category: string | null;
+  total_responses: number;
+  option_counts: Record<string, number> | null;
+  raw_answers: string[] | null;
+}
+
+export interface RespondentRow {
+  session_id: number;
+  mode: SessionMode;
+  status: string;
+  started_at: string;
+  completed_at: string | null;
+  answer_count: number;
+  name: string | null;
+  email: string | null;
+  company: string | null;
+  role: string | null;
+  company_size: string | null;
+}

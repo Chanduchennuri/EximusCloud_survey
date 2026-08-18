@@ -4,8 +4,10 @@ from datetime import datetime, timezone
 from app.models.conversation import ConversationTurn
 from app.models.question import Question
 from app.models.research_session import ResearchSession
-
+from sqlalchemy import func
 from app.models.respondent import RespondentDetails
+from app.models.research_session import SessionMode
+
 class ResearchRepository:
 
     def create_session(
@@ -139,3 +141,83 @@ class ResearchRepository:
         )  
 
         return list(result)
+
+    
+
+    def get_analytics_summary(self, db: Session, study_id: int) -> dict:
+        total = db.scalar(
+            select(func.count(ResearchSession.id)).where(
+            ResearchSession.study_id == study_id
+        )
+    )
+        completed = db.scalar(
+            select(func.count(ResearchSession.id)).where(
+                ResearchSession.study_id == study_id,
+                ResearchSession.status == "completed",
+            )
+        )
+        generic = db.scalar(
+            select(func.count(ResearchSession.id)).where(
+                ResearchSession.study_id == study_id,
+                ResearchSession.mode == SessionMode.GENERIC,
+            )
+        )
+        deep_analysis = db.scalar(
+             select(func.count(ResearchSession.id)).where(
+                 ResearchSession.study_id == study_id,
+                 ResearchSession.mode == SessionMode.DEEP_ANALYSIS,
+            )
+        )
+        return {
+            "total_sessions": total or 0,
+            "completed_sessions": completed or 0,
+            "in_progress_sessions": (total or 0) - (completed or 0),
+            "generic_sessions": generic or 0,
+            "deep_analysis_sessions": deep_analysis or 0,
+        }
+
+
+    def get_all_conversation_turns_for_study(
+        self, db: Session, study_id: int
+    ) -> list[ConversationTurn]:
+        return list(
+            db.scalars(
+                select(ConversationTurn)
+                .join(ResearchSession, ConversationTurn.session_id == ResearchSession.id)
+                .where(ResearchSession.study_id == study_id)
+            )
+        )    
+    def get_respondents_for_study(self, db: Session, study_id: int) -> list[dict]:
+        sessions = db.scalars(
+        select(ResearchSession)
+        .where(ResearchSession.study_id == study_id)
+        .order_by(ResearchSession.started_at.desc())
+    ).all()
+
+        results = []
+        for session in sessions:
+            respondent = db.scalar(
+                select(RespondentDetails).where(
+                    RespondentDetails.session_id == session.id
+                )
+            )
+            answer_count = db.scalar(
+                select(func.count(ConversationTurn.id)).where(
+                    ConversationTurn.session_id == session.id
+                )
+            )
+            results.append({
+                "session_id": session.id,
+                "mode": session.mode,
+                "status": session.status,
+                "started_at": session.started_at,
+                "completed_at": session.completed_at,
+                "answer_count": answer_count or 0,
+                "name": respondent.name if respondent else None,
+                "email": respondent.email if respondent else None,
+                "company": respondent.company if respondent else None,
+                "role": respondent.role if respondent else None,
+                "company_size": respondent.company_size if respondent else None,
+            })
+
+        return results

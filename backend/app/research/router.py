@@ -70,3 +70,31 @@ def get_deep_analysis_question(
         db=db,
         session_id=session_id,
     )
+
+@router.get(
+    "/studies/{study_id}/analytics/summary",
+)
+def get_analytics_summary(
+    study_id: int,
+    db: Session = Depends(get_db),
+):
+    return service.get_analytics_summary(db=db, study_id=study_id)
+
+
+@router.get(
+    "/studies/{study_id}/analytics/questions",
+)
+def get_analytics_by_question(
+    study_id: int,
+    db: Session = Depends(get_db),
+):
+    return service.get_analytics_by_question(db=db, study_id=study_id)
+
+@router.get(
+    "/studies/{study_id}/respondents",
+)
+def get_respondents(
+    study_id: int,
+    db: Session = Depends(get_db),
+):
+    return service.get_respondents(db=db, study_id=study_id)
