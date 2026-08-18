@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.pytest_cache/
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Environment variables / secrets
+.env
+.env.local
+
+# Alembic (keep versions, ignore nothing extra needed here — versions folder should be committed)
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
